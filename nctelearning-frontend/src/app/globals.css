@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+:root {
+  /* NC Telearning Theme Colors */
+  --nc-cream: #FEF3E2;
+  --nc-gold: #F3C623;
+  --nc-orange: #FFB22C;
+  --nc-dark-orange: #FA812F;
+  
+  /* Background and foreground */
+  --background: #FEF3E2;
+  --foreground: #2D3748;
+  --card-background: #FFFFFF;
+  --border-color: #E2E8F0;
+}
+
+@theme {
+  --color-nc-cream: #FEF3E2;
+  --color-nc-gold: #F3C623;
+  --color-nc-orange: #FFB22C;
+  --color-nc-dark-orange: #FA812F;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card-background: var(--card-background);
+  --color-border: var(--border-color);
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* Vietnamese text styling */
+.vietnamese-text {
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.8;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--nc-cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--nc-gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--nc-orange);
+}
+
+/* Smooth transitions */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-nc-gold focus:ring-offset-2;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-nc-gold hover:bg-nc-orange text-white font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-nc-gold focus:ring-offset-2;
+}
+
+.btn-secondary {
+  @apply bg-white hover:bg-gray-50 text-nc-dark-orange font-semibold py-2 px-4 rounded-lg border border-nc-gold focus:outline-none focus:ring-2 focus:ring-nc-gold focus:ring-offset-2;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white rounded-lg shadow-md border border-gray-200 p-6;
+}
+
+/* Input styles */
+.input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-nc-gold focus:border-transparent;
+}
+
+/* Animation styles */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.3s ease-in-out;
+}

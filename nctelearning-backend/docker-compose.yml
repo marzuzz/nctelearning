@@ -1,0 +1,28 @@
+name: nctelearning-backend
+
+services: 
+  nctelearning-backend:
+    container_name: nctelearning-backend
+    image: nctelearning-backend
+    restart: always
+    env_file:
+      - .env  
+    
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports: 
+      - "2030:2030"
+    volumes:
+      - storage:/storage/files
+    networks: 
+      - nctelearning-network
+
+
+volumes: 
+  storage:
+
+networks: 
+  nctelearning-network:
+    external: true
+      

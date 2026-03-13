@@ -1,0 +1,39 @@
+# Render Blueprint for NC Telearning Backend
+# This file can be used for Render Blueprint deployment
+# Or configure manually using the steps in DEPLOYMENT.md
+
+services:
+  # PostgreSQL Database
+  - type: pg
+    name: nctelearning-db
+    plan: free
+    databaseName: nctelearning
+    user: nct_user
+
+  # Backend API Service
+  - type: web
+    name: nctelearning-backend
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_TYPE
+        value: postgres
+      - key: DATABASE_SSL
+        value: "true"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 24h
+      - key: CORS_ORIGIN
+        value: https://your-frontend.vercel.app  # Update after Vercel deployment
+      - key: MAX_FILE_SIZE
+        value: "104857600"
+      - key: UPLOAD_DEST
+        value: ./uploads
+

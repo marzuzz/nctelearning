@@ -1,0 +1,20 @@
+name: nctelearning-frontend
+
+services:
+  nctelearning-frontend:
+    container_name: nctelearning-frontend
+    image: nctelearning-frontend
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "2032:2032"
+    env_file:
+      - .env
+    networks:
+      - nctelearning-network
+
+networks:
+  nctelearning-network:
+    driver: bridge
