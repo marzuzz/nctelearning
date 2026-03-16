@@ -23,6 +23,7 @@ export interface CreateEssayExerciseDto {
     | 'thong_tin'
     | 'nghi_luan_xa_hoi'
     | 'nghi_luan_van_hoc';
+  imageUrl?: string | null;
 }
 
 export interface CreateEssaySubmissionDto {

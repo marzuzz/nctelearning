@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
+import nextDynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { apiUrl } from "@/lib/api";
 
 // Force dynamic rendering - this page uses searchParams which requires dynamic rendering
 export const dynamic = "force-dynamic";
+
+const JoditEditor = nextDynamic(() => import("jodit-react"), { ssr: false });
 
 type QuestionInput = {
   questionText: string;
@@ -45,6 +48,18 @@ function NewExercisePageContent() {
     }
   }, [chosenType]);
 
+  useEffect(() => {
+    if (chosenType === "doc_hieu") {
+      setQuestions([
+        { questionText: "", points: 0.5 },
+        { questionText: "", points: 0.5 },
+        { questionText: "", points: 1 },
+        { questionText: "", points: 1 },
+        { questionText: "", points: 1 },
+      ]);
+    }
+  }, [chosenType]);
+
   const docHieuTopics = [
     { value: "tho", label: "Thơ" },
     { value: "truyen", label: "Truyện" },
@@ -67,15 +82,6 @@ function NewExercisePageContent() {
 
   // Lessons no longer required for creation, but we may keep fetching if needed in future.
 
-  const addQuestion = () => {
-    setQuestions((prev) => [
-      ...prev,
-      {
-        questionText: "",
-        points: 1,
-      },
-    ]);
-  };
 
   const updateQuestion = (
     index: number,
@@ -106,9 +112,13 @@ function NewExercisePageContent() {
     try {
       const quizRes = await fetch(apiUrl("/quizzes"), {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
         body: JSON.stringify({
           title,
+          // Save rich-text content into quizzes.description
           description: prompt,
           timeLimitMinutes:
             typeof timeLimitMinutes === "number" ? timeLimitMinutes : undefined,
@@ -215,12 +225,12 @@ function NewExercisePageContent() {
             </div>
             <div>
               <label className="label">Đề bài</label>
-              <textarea
-                className="input min-h-[120px]"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Nhập đề bài"
-              />
+              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <JoditEditor
+                  value={prompt}
+                  onChange={(content: string) => setPrompt(content)}
+                />
+              </div>
             </div>
             <div>
               <label className="label">
@@ -370,21 +380,18 @@ function NewExercisePageContent() {
 
           <div>
             <label className="label">Đề bài</label>
-            <textarea
-              className="input min-h-[160px]"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Nhập đề bài / hướng dẫn"
-            />
+            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+              <JoditEditor
+                value={prompt}
+                onChange={(content: string) => setPrompt(content)}
+              />
+            </div>
           </div>
 
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold text-nc-dark-orange">
               Câu hỏi
             </h2>
-            <button type="button" className="btn-primary" onClick={addQuestion}>
-              Thêm câu hỏi
-            </button>
           </div>
 
           <div className="space-y-6">
@@ -413,15 +420,11 @@ function NewExercisePageContent() {
 
                       <input
                         type="number"
-                        min={1}
+                        min={0}
+                        step={0.5}
                         className="input w-24"
                         value={q.points}
-                        onChange={(e) =>
-                          updateQuestion(idx, (prev) => ({
-                            ...prev,
-                            points: Number(e.target.value),
-                          }))
-                        }
+                        readOnly
                       />
                     </div>
 
@@ -429,16 +432,6 @@ function NewExercisePageContent() {
                       Học sinh sẽ trả lời bằng văn bản tự luận
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    className="text-red-600 hover:text-red-700 text-sm mt-2"
-                    onClick={() =>
-                      setQuestions((prev) => prev.filter((_, i) => i !== idx))
-                    }
-                    aria-label="Xóa câu hỏi"
-                  >
-                    Xóa
-                  </button>
                 </div>
               </div>
             ))}

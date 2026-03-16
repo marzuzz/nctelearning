@@ -93,6 +93,24 @@ type DetailedQuizAttempt = {
   }>;
 };
 
+function htmlToPlainText(input: string) {
+  const raw = (input ?? "").toString();
+  if (!raw) return "";
+
+  const preprocessed = raw
+    .replace(/<\s*br\s*\/?>/gi, "\n")
+    .replace(/<\/\s*(p|div|li|tr|h[1-6])\s*>/gi, "\n");
+
+  try {
+    const doc = new DOMParser().parseFromString(preprocessed, "text/html");
+    const text = doc.body?.textContent ?? "";
+    return text.replace(/\n{3,}/g, "\n\n").trim();
+  } catch {
+    return preprocessed.replace(/<[^>]*>/g, "").replace(/\n{3,}/g, "\n\n").trim();
+  }
+}
+
+
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
   return date.toLocaleDateString('vi-VN', {
@@ -689,7 +707,7 @@ export default function MySubmissionsPage() {
                         </div>
                         {showDescription && (
                           <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 text-gray-800 whitespace-pre-wrap leading-relaxed">
-                            {selectedAttempt.quiz.description}
+                            {htmlToPlainText(selectedAttempt.quiz.description as string)}
                           </div>
                         )}
                       </div>

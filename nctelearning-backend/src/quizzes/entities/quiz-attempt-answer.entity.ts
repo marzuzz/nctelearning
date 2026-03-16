@@ -30,7 +30,7 @@ export class QuizAttemptAnswer {
   @Column({ nullable: true })
   isCorrect: boolean;
 
-  @Column({ default: 0 })
+  @Column({ type: 'float', default: 0 })
   pointsEarned: number;
 
   @Column({ type: 'text', nullable: true })

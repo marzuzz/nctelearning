@@ -55,7 +55,6 @@ backend/uploads/
 *.tsbuildinfo
 
 # SSH Keys (NEVER commit private keys!)
-public
 *.pem
 *.key
 id_rsa

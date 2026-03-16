@@ -30,8 +30,6 @@ export class Quiz {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'text', nullable:true })
-
   @Column({ nullable: true })
   timeLimitMinutes: number;
 

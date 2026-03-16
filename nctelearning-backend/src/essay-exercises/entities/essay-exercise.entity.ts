@@ -54,6 +54,9 @@ export class EssayExercise {
     | 'nghi_luan_xa_hoi' // Nghị luận xã hội
     | 'nghi_luan_van_hoc';
 
+  @Column({ name: 'image_url', type: 'text', nullable: true })
+  imageUrl: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 

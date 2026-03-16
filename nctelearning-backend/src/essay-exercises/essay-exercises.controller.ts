@@ -12,8 +12,12 @@ export class EssayExercisesController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  createExercise(@Body() createExerciseDto: CreateEssayExerciseDto) {
-    return this.essayExercisesService.createExercise(createExerciseDto);
+  createExercise(
+    @Body() createExerciseDto?: CreateEssayExerciseDto,
+  ) {
+    return this.essayExercisesService.createExercise(
+      (createExerciseDto || ({} as CreateEssayExerciseDto)) as CreateEssayExerciseDto,
+    );
   }
 
   @Post('submissions')

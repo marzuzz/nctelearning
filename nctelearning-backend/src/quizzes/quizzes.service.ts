@@ -13,7 +13,6 @@ export interface CreateQuizDto {
   lessonId?: string;
   title: string;
   description?: string;
-  prompt,
   timeLimitMinutes?: number;
   maxAttempts?: number;
   isPublished?: boolean;
@@ -56,18 +55,24 @@ export class QuizzesService {
     private dataSource: DataSource,
   ) {}
 
-  async createQuiz(createQuizDto: CreateQuizDto): Promise<Quiz> {
+  async createQuiz(createQuizDto?: CreateQuizDto): Promise<Quiz> {
+    const dto = (createQuizDto ?? ({} as CreateQuizDto)) as CreateQuizDto;
+
+    if (!dto.title) {
+      throw new BadRequestException('Thiếu tiêu đề (title)');
+    }
+
     // If lessonId provided, ensure it exists; otherwise allow quiz without lesson
-    if (createQuizDto.lessonId) {
-      const lesson = await this.lessonsRepository.findOne({ where: { id: createQuizDto.lessonId }, relations: ['course'] });
+    if (dto.lessonId) {
+      const lesson = await this.lessonsRepository.findOne({ where: { id: dto.lessonId }, relations: ['course'] });
       if (!lesson) {
         throw new BadRequestException('Lesson không tồn tại');
       }
     }
 
     const quiz = this.quizzesRepository.create({
-      ...createQuizDto,
-      maxAttempts: createQuizDto.maxAttempts ?? 3,
+      ...dto,
+      maxAttempts: dto.maxAttempts ?? 3,
     });
     return this.quizzesRepository.save(quiz);
   }
@@ -328,8 +333,11 @@ export class QuizzesService {
     if (!answer) {
       throw new NotFoundException('Không tìm thấy câu trả lời');
     }
-    if (typeof pointsEarned === 'number') {
-      answer.pointsEarned = pointsEarned;
+    if (pointsEarned !== undefined) {
+      const numericPoints = Number(pointsEarned);
+      if (Number.isFinite(numericPoints)) {
+        answer.pointsEarned = numericPoints;
+      }
     }
     if (typeof isCorrect === 'boolean') {
       answer.isCorrect = isCorrect;
@@ -367,8 +375,28 @@ export class QuizzesService {
   }
 
   async updateAttemptScore(attemptId: string, score: number): Promise<QuizAttempt> {
-    // Use recalculateAttemptScore to ensure score is always accurate
-    return this.recalculateAttemptScore(attemptId);
+    // Cập nhật điểm tổng của bài làm theo điểm giáo viên nhập
+    // và đồng thời đảm bảo totalPoints luôn được tính từ điểm tối đa của các câu hỏi
+    const attempt = await this.attemptsRepository.findOne({
+      where: { id: attemptId },
+      relations: ['quiz', 'quiz.questions'],
+    });
+
+    if (!attempt) {
+      throw new NotFoundException('Không tìm thấy bài làm');
+    }
+
+    // Điểm tổng do giáo viên nhập (đã là tổng các điểm từng câu trên FE)
+    // Luôn ép về number hữu hạn để tránh trường hợp FE gửi string.
+    const numericScore = Number(score);
+    attempt.score = Number.isFinite(numericScore) ? numericScore : 0;
+
+    // Giữ totalPoints luôn đúng theo cấu hình đề bài
+    if (attempt.quiz && attempt.quiz.questions) {
+      attempt.totalPoints = attempt.quiz.questions.reduce((sum, q) => sum + (q.points || 0), 0);
+    }
+
+    return this.attemptsRepository.save(attempt);
   }
 
   async deleteAllAttempts(): Promise<{ message: string; deletedAttempts: number; deletedAnswers: number }> {

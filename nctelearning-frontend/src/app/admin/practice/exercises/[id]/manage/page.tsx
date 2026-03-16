@@ -17,6 +17,11 @@ type Attempt = {
 };
 
 type FullAttempt = Attempt & {
+  quiz?: {
+    id: string;
+    title: string;
+    description?: string | null;
+  };
   answers: {
     id: string;
     question: { id: string; questionText: string; points: number };
@@ -153,6 +158,17 @@ export default function ManageExercisePage() {
               <h3 className="text-xl font-semibold">Bài làm của {selectedAttempt.user.firstName} {selectedAttempt.user.lastName}</h3>
             </div>
             <div className="space-y-4">
+              {selectedAttempt.quiz?.description && (
+                <div className="border rounded p-3 bg-white">
+                  <div className="text-sm text-gray-500 mb-1">Đề bài</div>
+                  <div
+                    className="prose max-w-none text-gray-800"
+                    dangerouslySetInnerHTML={{
+                      __html: selectedAttempt.quiz?.description as string,
+                    }}
+                  />
+                </div>
+              )}
               {selectedAttempt.answers.map((ans, idx) => (
                 <div key={ans.id} className="border rounded p-3">
                   <div className="text-sm text-gray-500 mb-1">Câu {idx + 1} • {ans.question.points} điểm</div>

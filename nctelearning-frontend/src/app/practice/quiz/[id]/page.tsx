@@ -16,7 +16,13 @@ type Question = {
   questionType?: 'multiple_choice' | 'essay';
   options?: Option[] 
 };
-type Quiz = { id: string; title: string; description: string; timeLimitMinutes?: number; questions: Question[] };
+type Quiz = {
+  id: string;
+  title: string;
+  description?: string | null;
+  timeLimitMinutes?: number;
+  questions: Question[];
+};
 
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
@@ -686,9 +692,19 @@ export default function QuizTakePage() {
       
       {quiz && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          <div className="card">
-            <h1 className="text-2xl font-bold text-nc-dark-orange mb-2">{quiz.title}</h1>
-            <p className="text-gray-700 whitespace-pre-wrap">{quiz.description}</p>
+          <div className="card space-y-4">
+            <div>
+              <h1 className="text-2xl font-bold text-nc-dark-orange mb-2">
+                {quiz.title}
+              </h1>
+              {/* Rich-text content is stored in quizzes.description */}
+              {quiz.description && (
+                <div
+                  className="text-gray-800 prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: quiz.description }}
+                />
+              )}
+            </div>
           </div>
 
           <div className="space-y-4">

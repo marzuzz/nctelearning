@@ -35,7 +35,7 @@ export class EssaySubmission {
   @Column({ nullable: true })
   gradedAt: Date;
 
-  @Column({ nullable: true })
+  @Column({ type: 'float', nullable: true })
   grade: number;
 
   @Column({ type: 'text', nullable: true })

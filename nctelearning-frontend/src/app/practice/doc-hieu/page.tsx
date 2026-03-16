@@ -20,7 +20,6 @@ const DOC_HIEU_TOPICS = [
 type Quiz = {
   id: string;
   title: string;
-  description?: string;
   gradeLevel?: '10' | '11' | '12' | null;
   topic?: string | null;
   practiceType?: 'doc_hieu' | 'viet' | null;
@@ -97,7 +96,7 @@ export default function DocHieuSelectionPage() {
       const titleMatch = e.title.toLowerCase().includes(searchTerm.toLowerCase());
       const contentMatch = e.type === 'essay' 
         ? (e as EssayExercise).prompt.toLowerCase().includes(searchTerm.toLowerCase())
-        : (e as Quiz).description?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+        : false;
       if (!titleMatch && !contentMatch) return false;
     }
     if (user?.role === 'user' && exerciseGrade && exerciseGrade !== user.gradeLevel) return false;
@@ -193,9 +192,6 @@ export default function DocHieuSelectionPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {filtered.map(e => {
                       const displayGrade = e.gradeLevel || (e.type === 'quiz' ? (e as Quiz).lesson?.course?.gradeLevel : null);
-                      const content = e.type === 'essay' 
-                        ? (e as EssayExercise).prompt 
-                        : (e as Quiz).description || 'Không có mô tả';
                       const exerciseLink = e.type === 'quiz' 
                         ? `/practice/quiz/${e.id}`
                         : `/practice/doc-hieu/${e.id}`;
@@ -208,7 +204,9 @@ export default function DocHieuSelectionPage() {
                             </span>
                           </div>
                           <div className="font-semibold text-nc-dark-orange mb-1">{e.title}</div>
-                          <div className="text-sm text-gray-600 mb-2 line-clamp-3">{content}</div>
+                          <div className="text-sm text-gray-600 mb-2">
+                            Hãy thực hiện bài tập này
+                          </div>
                           <Link href={exerciseLink} className="text-nc-gold hover:underline text-sm">
                             Làm bài tập này →
                           </Link>

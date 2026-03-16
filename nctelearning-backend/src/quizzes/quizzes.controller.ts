@@ -12,8 +12,11 @@ export class QuizzesController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  createQuiz(@Body() createQuizDto: CreateQuizDto) {
-    return this.quizzesService.createQuiz(createQuizDto);
+  createQuiz(
+    @Body() createQuizDto?: CreateQuizDto,
+  ) {
+    const dto = (createQuizDto ?? {}) as CreateQuizDto;
+    return this.quizzesService.createQuiz(dto);
   }
 
   @Post('questions')
@@ -100,11 +103,13 @@ export class QuizzesController {
   @UseGuards(JwtAuthGuard)
   updateAnswer(
     @Param('answerId') answerId: string,
-    @Body() body: { answerText?: string; selectedOptionId?: string; pointsEarned?: number; isCorrect?: boolean; feedback?: string }
+    @Body() body: { answerText?: string; selectedOptionId?: string; pointsEarned?: number | string; isCorrect?: boolean; feedback?: string }
   ) {
     // If it's an admin request with pointsEarned or isCorrect, use gradeAnswer
     if (body.pointsEarned !== undefined || body.isCorrect !== undefined || body.feedback !== undefined) {
-      return this.quizzesService.gradeAnswer(answerId, body.pointsEarned, body.isCorrect, body.feedback);
+      const parsedPointsEarned =
+        typeof body?.pointsEarned === 'string' ? Number.parseFloat(body.pointsEarned) : body?.pointsEarned;
+      return this.quizzesService.gradeAnswer(answerId, parsedPointsEarned as number, body.isCorrect, body.feedback);
     }
     // Otherwise, update the answer text or selected option
     return this.quizzesService.updateAnswer(answerId, body.answerText, body.selectedOptionId);
@@ -115,9 +120,11 @@ export class QuizzesController {
   @Roles(UserRole.ADMIN)
   updateAttemptScore(
     @Param('attemptId') attemptId: string,
-    @Body() body: { score: number }
+    @Body() body: { score: number | string }
   ) {
-    return this.quizzesService.updateAttemptScore(attemptId, body.score);
+    const parsedScore =
+      typeof body?.score === 'string' ? Number.parseFloat(body.score) : body?.score;
+    return this.quizzesService.updateAttemptScore(attemptId, parsedScore as number);
   }
 
   @Get('admin/attempts/by-grade')

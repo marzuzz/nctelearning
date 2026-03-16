@@ -130,7 +130,10 @@ export default function VietExercisePage() {
       </div>
       {/* Prompt at top */}
       <div className="max-w-2xl w-full bg-white rounded-xl shadow p-6 mb-8">
-        <div className="text-2xl font-bold text-nc-dark-orange mb-4">{exercise.prompt}</div>
+        <div
+          className="text-nc-dark-orange mb-4 prose max-w-none"
+          dangerouslySetInnerHTML={{ __html: exercise.prompt }}
+        />
         {exercise.description && (
           <div className="text-gray-600 mb-2">{exercise.description}</div>
         )}

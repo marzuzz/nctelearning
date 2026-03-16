@@ -38,7 +38,7 @@ export class QuizQuestion {
   @Column()
   orderIndex: number;
 
-  @Column({ default: 1 })
+  @Column({ type: 'float', default: 1 })
   points: number;
 
   @CreateDateColumn()
